@@ -17,14 +17,16 @@ env:
 jobs:
   build-and-deploy:
     runs-on: windows-latest
+    
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
 
       - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'microsoft'
 
       - name: 'Restore Project Dependencies Using Mvn'
         shell: pwsh
@@ -32,12 +34,13 @@ jobs:
           pushd './${{ env.PACKAGE_DIRECTORY }}'
           mvn clean package
           popd
+      
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
           app-name: 'JavaFAPOCGit'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ACFA24B0E2A04167A0677D8B6C8A8F68 }}
           package: '${{ env.PACKAGE_DIRECTORY }}'
           respect-pom-xml: true
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F9913B4FD6B34C9B854C92DB9689CE1F }}
